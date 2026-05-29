@@ -45,18 +45,29 @@ npm install
 
 ## Step 5: Configure environment variables
 
-Create `backend/.env` with the following content:
+Copy the example env file and edit it:
 
-```env
-PORT=3000
-DATABASE_URL=postgres://<your-mac-username>@localhost:5432/financemanager
-GOOGLE_CLIENT_ID=403631851055-h3jvufar9n0gilc6hnsm6aq05kig4b4u.apps.googleusercontent.com
-SESSION_SECRET=fm-dev-secret-a1b2c3d4e5f6g7h8i9j0
+```bash
+cp backend/.env.example backend/.env
 ```
 
-Replace `<your-mac-username>` with the output of `whoami`.
+Edit `backend/.env` and fill in these values:
 
-> **Note on Google OAuth:** The Client ID above is already configured in the Google Cloud Console for `http://localhost:3000`. No additional Google setup is needed — it will work out of the box.
+| Variable | How to get it |
+|---|---|
+| `DATABASE_URL` | Run `whoami` to get your macOS username. Replace `YOUR_MAC_USERNAME` in `postgres://YOUR_MAC_USERNAME@localhost:5432/financemanager` |
+| `GOOGLE_CLIENT_ID` | Go to https://console.cloud.google.com/apis/credentials → Create OAuth client ID → Web application → add `http://localhost:3000` as authorized JavaScript origin → copy the Client ID |
+| `SESSION_SECRET` | Any random string (e.g. run `openssl rand -hex 32`) |
+
+Example after filling:
+```env
+PORT=3000
+DATABASE_URL=postgres://john@localhost:5432/financemanager
+GOOGLE_CLIENT_ID=1234567890-xxxxx.apps.googleusercontent.com
+SESSION_SECRET=6a8b2c3d4e5f67890abcdef1234567890
+```
+
+> **Tip:** Keep this file private — it contains secrets. It's already listed in `.gitignore` so it won't be committed to GitHub.
 
 ## Step 6: Start the server
 
@@ -97,7 +108,7 @@ financemanager/
 │   │       ├── index.html
 │   │       ├── styles.css
 │   │       └── app.js
-│   ├── .env
+│   ├── .env.example
 │   └── package.json
 ├── requirements.md
 └── SETUP.md
@@ -112,7 +123,7 @@ Created automatically on first startup:
 | `users` | Google-authenticated users |
 | `assets` | Manual asset entries per user |
 | `liabilities` | Manual liability entries per user |
-| `net_worth_snapshots` | Net worth history per request |
+| `net_worth_snapshots` | Net worth history, recorded on data changes |
 
 ## API endpoints
 
@@ -151,3 +162,7 @@ createdb financemanager  # if it doesn't exist yet
 cd backend && npm install  # ensure all deps are installed
 node src/index.js          # check for error output
 ```
+
+**Google sign-in not working:**
+- Make sure `http://localhost:3000` is added to the authorized JavaScript origins in your Google Cloud Console OAuth settings
+- Verify the Client ID in `backend/.env` matches what's in the Google Cloud Console
