@@ -2,74 +2,45 @@
 
 ## Prerequisites
 
-- macOS (these instructions are for macOS via Homebrew)
-- Terminal access
+- **Node.js** v22 or later — [download](https://nodejs.org/)
+- **PostgreSQL** 16 — [download](https://www.postgresql.org/download/) or via package manager:
+  - macOS: `brew install postgresql@16`
+  - Ubuntu/Debian: `sudo apt install postgresql postgresql-client`
+  - Windows: [installer](https://www.postgresql.org/download/windows/)
 
-## Step 1: Install PostgreSQL
+## Step 1: Start PostgreSQL
 
-```bash
-brew install postgresql@16
-brew services start postgresql@16
-```
-
-Verify it's running:
-```bash
-pg_isready
-# expected output: /tmp:5432 - accepting connections
-```
-
-## Step 2: Install Node.js
-
-```bash
-brew install node
-```
-
-Verify:
-```bash
-node --version   # v22.x or later
-npm --version    # 10.x or later
-```
-
-## Step 3: Create the database
+Make sure PostgreSQL is running. Then create the database:
 
 ```bash
 createdb financemanager
 ```
 
-## Step 4: Install backend dependencies
+If `createdb` fails, your PostgreSQL may not be running or the user doesn't exist. Troubleshoot with:
+
+```bash
+pg_isready                # check if PostgreSQL is running
+psql -U postgres -c "CREATE DATABASE financemanager;"  # alternative
+```
+
+## Step 2: Install backend dependencies
 
 ```bash
 cd backend
 npm install
 ```
 
-## Step 5: Configure environment variables
+## Step 3: Configure environment variables
 
-Copy the example env file and edit it:
+Copy the example file:
 
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-Edit `backend/.env` and fill in these values:
+Then edit `backend/.env` with the secrets shared with you privately.
 
-| Variable | How to get it |
-|---|---|
-| `DATABASE_URL` | Run `whoami` to get your macOS username. Replace `YOUR_MAC_USERNAME` in `postgres://YOUR_MAC_USERNAME@localhost:5432/financemanager` |
-| `GOOGLE_CLIENT_ID` | Ask the team for the shared project Client ID. It's already configured in Google Cloud Console — just make sure your local URL (e.g. `http://localhost:3000`) is added to the authorized JavaScript origins by someone with GCP access. This is a one-time setup per developer. |
-| `SESSION_SECRET` | Any random string (e.g. run `openssl rand -hex 32`) |
-
-Example after filling:
-```env
-PORT=3000
-DATABASE_URL=postgres://john@localhost:5432/financemanager
-GOOGLE_CLIENT_ID=1234567890-xxxxx.apps.googleusercontent.com
-SESSION_SECRET=6a8b2c3d4e5f67890abcdef1234567890
-```
-
-> **Tip:** Keep this file private — it contains secrets. It's already listed in `.gitignore` so it won't be committed to GitHub.
-
-## Step 6: Start the server
+## Step 4: Start the server
 
 ```bash
 cd backend
@@ -82,11 +53,11 @@ cd backend
 npm run dev
 ```
 
-## Step 7: Open the app
+## Step 5: Open the app
 
 Visit **http://localhost:3000** in your browser.
 
-Click **"Sign in with Google"** to log in. After authentication, you'll see the dashboard where you can add assets and liabilities manually.
+Click **"Sign in with Google"** to log in. `http://localhost:3000` is already whitelisted in the project's Google OAuth settings — no additional setup needed.
 
 ## Project structure
 
@@ -147,15 +118,15 @@ Created automatically on first startup:
 
 **Port already in use:**
 ```bash
-lsof -i:3000   # find what's using port 3000
-kill -9 <PID>  # kill it, then restart
+lsof -i:3000   # macOS — find what's using port 3000
+kill -9 <PID>
 ```
+Windows: `netstat -ano | findstr :3000` then `taskkill /PID <PID> /F`
 
 **Database connection error:**
-```bash
-brew services restart postgresql@16
-createdb financemanager  # if it doesn't exist yet
-```
+- Ensure PostgreSQL is running
+- Run `createdb financemanager` if the database doesn't exist
+- Verify the username in `DATABASE_URL` matches your system user or use `postgres://postgres:password@localhost:5432/financemanager`
 
 **Server won't start:**
 ```bash
@@ -164,5 +135,5 @@ node src/index.js          # check for error output
 ```
 
 **Google sign-in not working:**
-- Make sure `http://localhost:3000` is added to the authorized JavaScript origins in your Google Cloud Console OAuth settings
-- Verify the Client ID in `backend/.env` matches what's in the Google Cloud Console
+- The project's Google Client ID already has `http://localhost:3000` whitelisted. Make sure you're accessing the app at that exact URL.
+- Verify the `GOOGLE_CLIENT_ID` in your `backend/.env` matches what was shared with you.
