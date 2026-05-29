@@ -56,7 +56,7 @@ Edit `backend/.env` and fill in these values:
 | Variable | How to get it |
 |---|---|
 | `DATABASE_URL` | Run `whoami` to get your macOS username. Replace `YOUR_MAC_USERNAME` in `postgres://YOUR_MAC_USERNAME@localhost:5432/financemanager` |
-| `GOOGLE_CLIENT_ID` | Go to https://console.cloud.google.com/apis/credentials → Create OAuth client ID → Web application → add `http://localhost:3000` as authorized JavaScript origin → copy the Client ID |
+| `GOOGLE_CLIENT_ID` | Ask the team for the shared project Client ID. It's already configured in Google Cloud Console — just make sure your local URL (e.g. `http://localhost:3000`) is added to the authorized JavaScript origins by someone with GCP access. This is a one-time setup per developer. |
 | `SESSION_SECRET` | Any random string (e.g. run `openssl rand -hex 32`) |
 
 Example after filling:
